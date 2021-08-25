@@ -1,0 +1,197 @@
+<el-table-column :label="$t('sysManage.sysManage4')" prop="createTime" align="center" min-width="90px"> <!-- 创建时间 -->
+        <template slot-scope="{ row }">
+          {{ row.createTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('sysManage.sysManage91')" prop="productName" align="center" min-width="90px" /> <!-- 产品名称 -->
+      <el-table-column :label="$t('borrow.borrow3')" prop="borrowStatus" align="center" min-width="80px"> <!-- 订单状态 -->
+        <template slot-scope="{ row }">
+          {{ row.borrowStatus | borrowStatusFilter }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('collect.collect156')" prop="bankAccount" align="center" min-width="80px" /> <!-- 银行账号 -->
+      <el-table-column :label="$t('collect.collect158')" prop="openBank" align="center" min-width="80px" /> <!-- 绑卡开户行 -->
+      <el-table-column :label="$t('collect.collect157')" prop="bankCode" align="center" min-width="80px" /> <!-- 银行代码 -->
+      <el-table-column :label="$t('collect.collect236')" prop="validateStatus" align="center" min-width="80px"> <!-- 绑卡审核状态 -->
+        <template slot-scope="{ row }">
+          <el-tag v-if="row.validateStatus == '0'" size="small" type="warning">{{ $t('collect.collect237') }}</el-tag> <!-- 待验证 -->
+          <el-tag v-else-if="row.validateStatus == '10'" size="small" type="success">{{ $t('borrow.borrow7') }}</el-tag> <!-- 通过 -->
+          <el-tag v-else-if="row.validateStatus == '20'" size="small" type="danger">{{ $t('collect.collect238') }}</el-tag> <!-- 未通过 -->
+          <el-tag v-else>{{ $t('collect.collect239') }}</el-tag> <!-- 待绑卡 -->
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('borrow.borrow27')" prop="principalAmount" align="center" min-width="90px" /> <!-- 本金 -->
+      <el-table-column :label="$t('borrow.borrow28')" prop="remainInterest" align="center" min-width="90px" /> <!-- 剩余利息 -->
+      <el-table-column
+        v-if="!isRemainOverdue"
+        :label="$t('borrow.borrow29')"
+        prop="remainOverdue"
+        align="center"
+        min-width="90px"
+      /> <!-- 剩余滞纳金 -->
+      <el-table-column :label="$t('borrow.borrow30')" prop="remainPrincipal" align="center" min-width="90px" /> <!-- 剩余本金 -->
+      <el-table-column :label="$t('collect.collect189')" prop="remainService" align="center" min-width="90px" /> <!-- 剩余手续费 -->
+      <el-table-column :label="$t('collect.collect233')" prop="amountPaid" align="center" min-width="90px" /> <!-- 累计已还金额 -->
+      <el-table-column
+        v-if="!isOverdueAmount"
+        :label="$t('collect.collect171')"
+        prop="overdueAmount"
+        align="center"
+        min-width="90px"
+      /> <!-- 逾期还款的金额 -->
+      <el-table-column
+        v-if="!isTotalOverdue"
+        :label="$t('borrow.borrow34')"
+        prop="totalOverdue"
+        align="center"
+        min-width="90px"
+      /> <!-- 总滞纳金 -->
+      <el-table-column :label="$t('collect.collect159')" prop="deductedServiceAmount" align="center" min-width="90px" /> <!-- 扣除的手续费 -->
+      <el-table-column :label="$t('borrow.borrow25')" prop="interestAmount" align="center" min-width="90px" /> <!-- 利息 -->
+      <el-table-column :label="$t('borrow.borrow16')" align="center" min-width="90px"> <!-- 最后还款时间 -->
+        <template slot-scope="{ row }">
+          {{ row.lastRepayTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect165')" prop="loanConfirmResult" align="center" min-width="90px"> <!-- 用户确认结果 -->
+        <template slot-scope="{ row }">
+          {{ row.loanConfirmResult === true ? $t('common.common106') : row.loanConfirmResult === false ? $t('common.common107') : '' }} <!-- 同意  拒绝 -->
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect166')" prop="loanConfirmTime" align="center" min-width="90px"> <!-- 用户确认时间 -->
+        <template slot-scope="{ row }">
+          {{ row.loanConfirmTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('borrow.borrow5')" prop="loanType" align="center" min-width="90px"> <!-- 贷款类型 -->
+        <template slot-scope="{ row }">
+          {{ row.loanType | loanTypeFilter }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect167')" prop="marketId" align="center" min-width="90px" /> <!-- 订单来源贷超号 -->
+      <el-table-column v-if="permission.isAdmin" :label="$t('borrow.borrow17')" prop="marketType" align="center" min-width="90px" /> <!-- 贷超类型 -->
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect168')" prop="modelResultNext" align="center" min-width="80px"> <!-- 准入期 -->
+        <template slot-scope="{ row }">
+          {{ row.modelResultNext | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect169')" prop="modelResultReason" align="center" min-width="90px" /> <!-- 模型分结果 -->
+      <el-table-column v-if="permission.isAdmin" :label="$t('borrow.borrow19')" prop="modelResultScore" align="center" min-width="80px"> <!-- 模型分 -->
+        <template slot-scope="{ row }">
+          {{ row.modelResultScore | modelResultScoreFilter }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect170')" prop="modelResultTime" align="center" min-width="90px"> <!-- 获取模型结果的时间 -->
+        <template slot-scope="{ row }">
+          {{ row.modelResultTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('borrow.borrow10')" prop="modelResultType" align="center" min-width="90px"> <!-- 风控结果 -->
+        <template slot-scope="{ row }">
+          {{ row.modelResultType | modelResultTypeFilter }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('sysManage.sysManage92')" prop="modelType" align="center" min-width="90px"> <!-- 模型类型 -->
+        <template slot-scope="{ row }">
+          {{ row.modelType | modelTypeFilter }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect174')" prop="pushCurrentIndex" align="center" min-width="90px" /> <!-- 当前推送编号 -->
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect175')" prop="pushEnd" align="center" min-width="90px"> <!-- 推送结束时间 -->
+        <template slot-scope="{ row }">
+          {{ row.pushEnd | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect176')" prop="pushMaxCount" align="center" min-width="90px" /> <!-- 最大推送次数 -->
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect177')" prop="pushStart" align="center" min-width="90px"> <!-- 推送开始时间 -->
+        <template slot-scope="{ row }">
+          {{ row.pushStart | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('collect.collect178')" prop="receiveAmount" align="center" min-width="90px" /> <!-- 到账金额 -->
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect179')" prop="releaseApplyRequestId" align="center" min-width="90px" /> <!-- 放款请求时我方流水号 -->
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect180')" prop="releaseApplyRequestTime" align="center" min-width="90px"> <!-- 放款请求时间 -->
+        <template slot-scope="{ row }">
+          {{ row.releaseApplyRequestTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect181')" prop="releaseApplyResponeId" align="center" min-width="90px" /> <!-- 放款请求提供商的流水号 -->
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect182')" prop="releaseApplyResponeTime" align="center" min-width="90px"> <!-- 放款请求返回的响应时间 -->
+        <template slot-scope="{ row }">
+          {{ row.releaseApplyResponeTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('borrow.borrow35')" prop="releasePayCompany" align="center" min-width="70px"> <!-- 支付公司 -->
+        <template slot-scope="{ row }">
+          {{ row.releasePayCompany | payCompanyFilter }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="!isReleaseResultSucceed" :label="$t('collect.collect184')" prop="releaseResultErrorMsg" align="center" min-width="90px" /> <!-- 放款失败原因 -->
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect185')" prop="releaseResultResponeId" align="center" min-width="90px" /> <!-- 放款结果响应编号 -->
+      <el-table-column :label="$t('collect.collect186')" prop="releaseResultSucceed" align="center" min-width="90px"> <!-- 放款结果是否成功 -->
+        <template slot-scope="{ row }">
+          {{ row.releaseResultSucceed ? $t('collect.collect224') : row.releaseResultSucceed === false ? $t('collect.collect225') : '' }} <!-- 成功 失败 -->
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('collect.collect187')" prop="releaseResultTime" align="center" min-width="90px"> <!-- 到账时间 -->
+        <template slot-scope="{ row }">
+          {{ row.releaseResultTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect188')" prop="releaseResultType" align="center" min-width="90px" /> <!-- 放款结果响应方式 -->
+      <el-table-column :label="$t('collect.collect195')" prop="repayOverdueCount" align="center" min-width="90px" /> <!-- 还款逾期次数 -->
+      <el-table-column :label="$t('collect.collect196')" prop="repayStartTime" align="center" min-width="90px"> <!-- 开始还款时间 -->
+        <template slot-scope="{ row }">
+          {{ row.repayStartTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('collect.collect161')" prop="enterOverdueTime" align="center" min-width="90px"> <!-- 进入逾期状态的时间 -->
+        <template slot-scope="{ row }">
+          {{ row.enterOverdueTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="permission.isAdmin" :label="$t('collect.collect197')" prop="trialCalculateTime" align="center" min-width="90px"> <!-- 试算完成时间 -->
+        <template slot-scope="{ row }">
+          {{ row.trialCalculateTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('collect.collect194')" prop="repayFinishTime" align="center" min-width="90px"> <!-- 还款完成时间 -->
+        <template slot-scope="{ row }">
+          {{ row.repayFinishTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('collect.collect164')" prop="finishTime" align="center" min-width="90px"> <!-- 所有款还完时间 -->
+        <template slot-scope="{ row }">
+          {{ row.finishTime | ArrayToDateFormat }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('borrow.borrow24')" prop="releaseResultRemark" align="center" min-width="90px"> <!-- 放款备注 -->
+        <template slot-scope="{ row }">
+          <el-popover
+            v-if="row.releaseResultRemark"
+            placement="left-start"
+            :title="$t('common.common12') + ':'"
+            width="100"
+            trigger="click"
+            :content="row.releaseResultRemark"
+            :visible-arrow="false"
+          >
+            <el-button slot="reference" type="text">{{ $t('common.common20') }}</el-button> <!-- 查看 -->
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('common.common12')" prop="borrowRemark" align="center" min-width="90px"> <!-- 备注 -->
+        <template slot-scope="{ row }">
+          <el-popover
+            v-if="row.borrowRemark"
+            placement="left-start"
+            :title="$t('common.common12') + ':'"
+            width="100"
+            trigger="click"
+            :content="row.borrowRemark"
+            :visible-arrow="false"
+          >
+            <el-button slot="reference" type="text">{{ $t('common.common20') }}</el-button> <!-- 查看 -->
+          </el-popover>
+        </template>
+      </el-table-column>
